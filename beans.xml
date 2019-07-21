@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN EN" 
+  "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<!-- targetとなるMessageBeanImplクラスの定義 -->
+    <bean id="targetBean" class="sample1.MessageBeanImpl">
+        <property name="name">
+            <value>Spring</value>
+        </property>
+    </bean>
+    <!--  MessageBeanImplにウィービングされるアドバイスのLoggingAdviceクラスの定義 -->
+    <bean id="loggingAdvice" class="sample1.LoggingAdvice" />
+    <!-- targetの代理インスタンス(プロキシ)を生成するProxyFactoryBeanの定義 -->
+    <bean id="proxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target">
+            <ref local="targetBean" />
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>advisor</value>
+            </list>
+        </property>
+    </bean>
+    <!-- advisorの定義 -->
+    <bean id="advisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+        <property name="advice">
+            <ref local="loggingAdvice" />
+        </property>
+        <property name="pointcut">
+            <bean class="org.springframework.aop.support.JdkRegexpMethodPointcut">
+                <property name="pattern">
+                    <value>.*sayHello.*</value>
+                </property>
+            </bean>
+        </property>
+    </bean>
+</beans>
